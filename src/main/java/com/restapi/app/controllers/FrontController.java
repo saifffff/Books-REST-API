@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,8 @@ import com.restapi.app.model.Book;
 public class FrontController {
 	@Autowired
 	private BookRepository bookDao;
+	
+	
 	
 	@GetMapping("/book/all")
 	public ResponseEntity<List<Book>> getAllBooks() {
@@ -53,6 +56,9 @@ public class FrontController {
 	}
 	
 	
+	
+	
+	
 	@PostMapping("/add/book")
 	public ResponseEntity<Book> createBook(@RequestBody Book book) {
 		Optional<Book> chkbk = this.bookDao.findById(book.getId());
@@ -66,14 +72,27 @@ public class FrontController {
 	 @PostMapping("/add/books")
 	  public ResponseEntity<List<Book>> uploadBooks(@RequestBody List<Book> books) {
 	    try {
-	      // Save each book in the list to the database
-	      List<Book> savedBooks = books.stream()
-	          .map(bookDao::save)
-	          .collect(Collectors.toList());
-	      return ResponseEntity.ok(savedBooks); // Return the list of saved books (status code 201)
-	    } catch (Exception e) {
-	      // Handle any exceptions during saving (e.g., database errors)
-	      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	    }
+		      // Save each book in the list to the database
+		      List<Book> savedBooks = books.stream()
+		          .map(bookDao::save)
+		          .collect(Collectors.toList());
+		      return ResponseEntity.ok(savedBooks); // Return the list of saved books (status code 201)
+		} catch (Exception e) {
+		      // Handle any exceptions during saving (e.g., database errors)
+		      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		  }
 	  }
+	 
+	 
+	 @DeleteMapping("/delete/{id}")
+	 public ResponseEntity<Book> deleteBook(@PathVariable("id") int id){
+		Optional<Book> getbook = this.bookDao.findById(id);
+		if(!getbook.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		this.bookDao.deleteById(id);
+		return ResponseEntity.of(getbook);
+	 }
+	 
+	 
 }
