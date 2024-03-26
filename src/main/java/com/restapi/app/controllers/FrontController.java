@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -94,5 +95,14 @@ public class FrontController {
 		return ResponseEntity.of(getbook);
 	 }
 	 
+	 @PutMapping("/update")
+	 public ResponseEntity<Book> updateBook(@RequestBody Book book){
+		 Optional<Book> mybook = this.bookDao.findById(book.getId());
+			if(!mybook.isPresent()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			}
+			this.bookDao.save(book);
+			return ResponseEntity.of(Optional.of(book));
+	 }
 	 
 }
